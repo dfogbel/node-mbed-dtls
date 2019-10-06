@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "mocha": "^2.3.3",
-    "node-gyp": "5.0.4",
+    "node-gyp": "^3.0.3",
     "should": "^7.1.0",
     "sinon": "^1.17.1"
   },
