@@ -24,6 +24,7 @@ function identityPskCallback(id) {
 const opts = {
   key: path.join(__dirname, '../test/private.der'),
   debug: 4,
+  type: 'udp4',
   identityPskCallback : identityPskCallback,
   handshakeTimeoutMin: 3000
 };
