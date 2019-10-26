@@ -3,8 +3,10 @@
 var path = require('path');
 var dtls = require('../index');
 
-function identityPskCallback(id) {
+function identityPskCallback(id, cli_id) {
   let psk = '';
+
+  console.error(`id=${id}, client=${cli_id}`);
 
   switch (id)  {
     case 'foo':

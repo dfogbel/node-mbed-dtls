@@ -31,7 +31,7 @@ public:
              int debug_level = 0);
   inline mbedtls_ssl_config* config() { return &conf; }
   Nan::Callback* get_psk;
-  char *getPskFromIdentity(char *identity);
+  char *getPskFromIdentity(char *identity, const char*);
 private:
   void throwError(int ret);
   ~DtlsServer();

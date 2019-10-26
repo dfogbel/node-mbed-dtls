@@ -35,7 +35,9 @@ int fetchPSKGivenID(void *parameter, mbedtls_ssl_context *ssl, const unsigned ch
   strncpy(pskIdentity,(char*)psk_identity,identity_len);
   pskIdentity[identity_len]='\0';
 
-  psk = dtlsServer->getPskFromIdentity(pskIdentity);
+  char *cli_id = strndup(reinterpret_cast<const char*>(ssl->cli_id), ssl->cli_id_len);
+
+  psk = dtlsServer->getPskFromIdentity(pskIdentity, cli_id);
 
   if (!psk) {
     goto clean_and_exit;
@@ -47,6 +49,7 @@ int fetchPSKGivenID(void *parameter, mbedtls_ssl_context *ssl, const unsigned ch
 clean_and_exit:
   free(psk);
   free(pskIdentity);
+  free(cli_id);
   return status;
 }
 
@@ -78,7 +81,7 @@ void DtlsServer::New(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   }
 
   if (info[1]->IsFunction() == false) {
-   return Nan::ThrowTypeError("Expecting param 2 to be a function"); 
+   return Nan::ThrowTypeError("Expecting param 2 to be a function");
   }
 
   size_t key_len = Buffer::Length(info[0]);
@@ -177,14 +180,15 @@ NAN_SETTER(DtlsServer::SetHandshakeTimeoutMin) {
   mbedtls_ssl_conf_handshake_timeout(server->config(), value->Uint32Value(), server->config()->hs_timeout_max);
 }
 
-char *DtlsServer::getPskFromIdentity(char *identity) {
+char *DtlsServer::getPskFromIdentity(char *identity, const char *cli_id) {
   char *psk = NULL;
 
   v8::Local<v8::Value> argv[] = {
-    Nan::New(identity).ToLocalChecked()
+    Nan::New(identity).ToLocalChecked(),
+    Nan::New(cli_id).ToLocalChecked()
   };
   v8::Local<v8::Function> getPskCallback = get_psk->GetFunction();
-  v8::Local<v8::Value> jsPsk = getPskCallback->Call(Nan::GetCurrentContext()->Global(), 1, argv);
+  v8::Local<v8::Value> jsPsk = getPskCallback->Call(Nan::GetCurrentContext()->Global(), 2, argv);
 
   Nan::Utf8String jsUtf8Psk(jsPsk->ToString());
   int pskLen = jsUtf8Psk.length();
