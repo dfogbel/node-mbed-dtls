@@ -33,6 +33,7 @@ const opts = {
 
 const dtlsserver = dtls.createServer(opts, socket => {
   console.log(`secure connection from ${socket.remoteAddress}:${socket.remotePort}`);
+  console.log(socket);
   socket.on('data', msg => {
     //console.log('received:', msg.toString('utf8'));
     socket.write(msg);
